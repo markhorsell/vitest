@@ -1,39 +1,68 @@
-
-import { render, screen } from '@testing-library/react';
+import { render, screen } from "@testing-library/react";
+import OrderStatusSelector from "../../src/components/OrderStatusSelector";
 import { Theme } from "@radix-ui/themes";
+import userEvent from "@testing-library/user-event";
 
+describe("OrderStatusSelector", () => {
+  const renderComponent = () => {
+    const onChange = vi.fn();
 
+    render(
+      <Theme>
+        <OrderStatusSelector onChange={onChange} />
+      </Theme>
+    );
 
-import OrderStatusSelector from '../../src/components/OrderStatusSelector';
-import userEvent from '@testing-library/user-event';
+    return {
+      trigger: screen.getByRole("combobox"),
+      getOptions: () => screen.findAllByRole("option"),
+      getOption: (label: RegExp) => screen.findByRole('option', { name: label }),
+      user: userEvent.setup(),
+      onChange
+    }
+  }
 
+  it("should render New as the default value", () => {
+    const {trigger} = renderComponent();
 
-describe('OrderStatusSelector', () => {
-    it('should be new by default ', async () => {
-        render(<Theme>
-            <OrderStatusSelector onChange={value => console.log(value)} />
-        </Theme>)
-        const button = screen.getByRole('combobox');
-        expect(button).toBeInTheDocument()
-        expect(button).toHaveTextContent('New');
+    expect(trigger).toHaveTextContent(/new/i);
+  });
 
+  it("should render correct statuses", async () => {
+    const {trigger, getOptions, user} = renderComponent();
 
-    })
-    it('should contain these options ', async () => {
-        render(<Theme>
-            <OrderStatusSelector onChange={value => console.log(value)} />
-        </Theme>)
-        const button = screen.getByRole('combobox');
-        const user = userEvent.setup()
-        await user.click(button);
-        const options = await screen.findAllByRole('option')
-       const labels=options.map((o=>{
-        
-        return o.textContent
-       }))
-       expect(labels).toEqual(['New','Processed','Fulfilled'])
+    await user.click(trigger);
 
+    const options = await getOptions();
+    expect(options).toHaveLength(3);
+    const labels = options.map((option) => option.textContent);
+    expect(labels).toEqual(["New", "Processed", "Fulfilled"]);
+  });
 
-    })
-})
+  it.each([
+    { label: /processed/i, value: 'processed' },
+    { label: /fulfilled/i, value: 'fulfilled' },
+  ])('should call onChange with $value when the $label option is selected', async ({ label, value }) => {
+    const {trigger, user, onChange, getOption} = renderComponent();
+    await user.click(trigger);
 
+    const option = await getOption(label);
+    await user.click(option);
+
+    expect(onChange).toHaveBeenCalledWith(value);
+  });
+
+  it("should call onChange with 'new' when the New option is selected", async () => {
+    const {trigger, user, onChange, getOption} = renderComponent();
+    await user.click(trigger);
+
+    const processedOption = await getOption(/processed/i);
+    await user.click(processedOption);
+
+    await user.click(trigger);
+    const newOption = await getOption(/new/i);
+    await user.click(newOption);
+
+    expect(onChange).toHaveBeenCalledWith('new');
+  })
+});

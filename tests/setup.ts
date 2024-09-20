@@ -1,3 +1,5 @@
+
+
 import '@testing-library/jest-dom/vitest';
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -9,6 +11,7 @@ window.HTMLElement.prototype.releasePointerCapture = vi.fn();
 
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
+   // eslint-disable-next-line 
     value: (query: any) => ({
       matches: false,
       media: query,
