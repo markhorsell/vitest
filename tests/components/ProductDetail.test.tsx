@@ -1,10 +1,9 @@
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react'
-import ProductList from '../../src/components/ProductList'
 import { server } from '../mocks/server'
 import { delay, http, HttpResponse } from 'msw'
 import ProductDetail from '../../src/components/ProductDetail'
 import { db } from '../mocks/db'
-//import { products } from '../mocks/data'
+import { AllProviders } from '../AllProviders'
 
 describe('ProductDetail', () => {
     let productId:number;
@@ -20,7 +19,9 @@ describe('ProductDetail', () => {
     
     })
     it('should render product details', async () => {
-        render(<ProductDetail productId={productId} />)
+        render(<ProductDetail productId={productId} />,{wrapper: AllProviders})
+
+    
 
        const product=db.product.findFirst({where:{id:{equals:productId}}});
 
@@ -33,21 +34,21 @@ describe('ProductDetail', () => {
    
     it('should render msg if prod not found', async () => {
         server.use(http.get('products/:1', () => HttpResponse.json(null)))
-        render(<ProductDetail productId={1} />)
+        render(<ProductDetail productId={1} />,{wrapper: AllProviders})
         const msg = await screen.findByText(/not found/i);
         expect(msg).toBeInTheDocument()
 
     })
     it('should render an error for invalid id', async () => {
     
-        render(<ProductDetail productId={0} />)
+        render(<ProductDetail productId={0} />,{wrapper: AllProviders})
         const msg = await screen.findByText(/invalid/i);
         expect(msg).toBeInTheDocument()
 
     })
     it('should render an error if data fetch fails', async () => {
         server.use(http.get('products/:1', () => HttpResponse.error()))
-        render(<ProductDetail productId={0} />)
+        render(<ProductDetail productId={1} />,{wrapper: AllProviders})
         const errmsg = await screen.findByText(/error/i);
         expect(errmsg).toBeInTheDocument()
 
@@ -58,21 +59,21 @@ describe('ProductDetail', () => {
             await delay();
             HttpResponse.json([])
         }))
-        render(<ProductDetail productId={1}/>)
+        render(<ProductDetail productId={1} />,{wrapper: AllProviders})
         const loadingMsg = await screen.findByText(/loading/i);
 
         expect(loadingMsg).toBeInTheDocument()
 
     })
     it('should remove loading indicator after data is loaded', async () => {
-        render(<ProductDetail productId={1}/>)
+        render(<ProductDetail productId={1} />,{wrapper: AllProviders})
         await waitForElementToBeRemoved(() => {
             return screen.queryByText(/loading/i);
         })
     })
     it('should remove loading indicator if data fetching fails', async () => {
         server.use(http.get('/products/:1', () => HttpResponse.error()))
-        render(<ProductDetail productId={1}/>)
+        render(<ProductDetail productId={1} />,{wrapper: AllProviders})
         await waitForElementToBeRemoved(() => {
             return screen.queryByText(/loading/i);
         })
