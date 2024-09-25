@@ -12,10 +12,8 @@ describe('group', () => {
     // })
     it('should',()=>{
         const product = db.product.create({name:'Apple'});
-        console.log('APPLE')
-        console.log(db.product.getAll())
+  
         db.product.delete({where:{id:{equals:product.id}}})
-        console.log('EMPTY')
-        console.log(db.product.getAll())
+    
     })
 })

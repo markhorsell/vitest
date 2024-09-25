@@ -3,7 +3,7 @@ import { server } from '../mocks/server'
 import { delay, http, HttpResponse } from 'msw'
 import ProductDetail from '../../src/components/ProductDetail'
 import { db } from '../mocks/db'
-import { AllProviders } from '../AllProviders'
+import AllProviders from '../AllProviders'
 
 describe('ProductDetail', () => {
     let productId:number;
