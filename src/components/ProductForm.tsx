@@ -10,6 +10,7 @@ import {
   productFormSchema,
 } from "../validationSchemas/productSchema";
 import ErrorMessage from "./ErrorMessage";
+import Label from "./Label";
 
 interface Props {
   product?: Product;
@@ -48,8 +49,9 @@ const ProductForm = ({ product, onSubmit }: Props) => {
       className="space-y-3"
     >
       <Box>
+       
         <TextField.Root className="max-w-sm">
-          <TextField.Input placeholder="Name" {...register("name")} size="3" />
+          <TextField.Input autoFocus placeholder="Name" {...register("name")} size="3" />
         </TextField.Root>
         <ErrorMessage error={errors.name} />
       </Box>
@@ -75,7 +77,7 @@ const ProductForm = ({ product, onSubmit }: Props) => {
               defaultValue={product?.categoryId.toString() || ""}
               onValueChange={(value) => field.onChange(+value)}
             >
-              <Select.Trigger placeholder="Category" />
+              <Select.Trigger aria-label="Category" placeholder="Category" />
               <Select.Content>
                 <Select.Group>
                   {categories?.map((category) => (
