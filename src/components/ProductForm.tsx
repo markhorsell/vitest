@@ -10,7 +10,6 @@ import {
   productFormSchema,
 } from "../validationSchemas/productSchema";
 import ErrorMessage from "./ErrorMessage";
-import Label from "./Label";
 
 interface Props {
   product?: Product;

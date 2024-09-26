@@ -43,6 +43,12 @@ describe("ProductForm", () => {
         expect(error).toBeInTheDocument();
         expect(error).toHaveTextContent(errorMessage);
       },
+      expectErrorNotToBeInTheDocument: () => {
+        const error = screen.queryByRole("alert");
+   
+        expect(error).not.toBeInTheDocument();
+   
+      },
 
       waitForFormToLoad: async () => {
         await screen.findByRole("form");
@@ -56,7 +62,7 @@ describe("ProductForm", () => {
 
         type FormData = {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          [K in keyof Product]: any;
+          [K in keyof Product]: any
         };
 
         const validData: FormData = {
@@ -153,6 +159,7 @@ describe("ProductForm", () => {
         renderComponent();
 
       const form = await waitForFormToLoad();
+      console.log(name)
       await form.fill({ ...form.validData, name });
 
       expectErrorToBeInTheDocument(errorMessage);
@@ -224,6 +231,8 @@ describe("ProductForm", () => {
     const { waitForFormToLoad, onSubmit } = renderComponent();
     onSubmit.mockReturnValue(new Promise(() => {}));
 
+   
+
     const form = await waitForFormToLoad();
     await form.fill(form.validData);
 
@@ -249,4 +258,55 @@ describe("ProductForm", () => {
 
     expect(form.submitButton).not.toBeDisabled();
   })
+  it.each([
+    {
+      scenario: "whitespace name",
+      errorMessage: /required/i,
+      name:" "
+    },
+    {
+        scenario: "long whitespace name",
+        errorMessage: /required/i,
+        name:"       "
+      },
+   
+  
+  ])(
+    "should display an error if name is $scenario",
+    async ({ name, errorMessage }) => {
+      const { waitForFormToLoad, expectErrorToBeInTheDocument } =
+        renderComponent();
+
+      const form = await waitForFormToLoad();
+      await form.fill({ ...form.validData, name });
+
+      expectErrorToBeInTheDocument(errorMessage);
+    }
+  );
+  it.each([
+    {
+      scenario: "not a whitespace name",
+      errorMessage: /required/i,
+      name:" a "
+    },
+    {
+        scenario: "not a long whitespace name",
+        errorMessage: /required/i,
+        name:"  a     "
+      },
+   
+  
+  ])(
+    "should trim whitespace name if name is $scenario",
+    async ({ name, errorMessage }) => {
+      const { waitForFormToLoad, expectErrorNotToBeInTheDocument } =
+        renderComponent();
+
+      const form = await waitForFormToLoad();
+      await form.fill({ ...form.validData, name });
+
+      expectErrorNotToBeInTheDocument();
+      
+    }
+  );
 });
