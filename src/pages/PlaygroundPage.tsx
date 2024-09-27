@@ -1,10 +1,13 @@
 
-import OrderStatusSelector from "../components/OrderStatusSelector";
+
 import ProductForm from "../components/ProductForm";
-import BrowseProducts from "./BrowseProductsPage";
+import { ProductFormData } from "../validationSchemas/productSchema";
+
 
 const PlaygroundPage = () => {
-  return <ProductForm/>;
+  return <ProductForm onSubmit={function (product: ProductFormData): Promise<void> {
+    throw new Error("Function not implemented.");
+  } }/>;
 };
 
 export default PlaygroundPage;
